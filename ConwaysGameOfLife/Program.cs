@@ -1,84 +1,89 @@
 ﻿using ConwaysGameOfLife;
 
 bool stop = false;
-const int MAX_HEIGTH = 30, MAX_WIDTH = 60;
-int[,] grid = new int[MAX_HEIGTH, MAX_WIDTH];
+const int MAX_ROWS = 30, MAX_COLUMNS = 60;
+int[,] grid = new int[MAX_ROWS, MAX_COLUMNS];
 int generation = 0;
 
-grid = new StarterArrays().starterArray1;
+Array.Copy(new StarterArrays().starterArray1, grid, MAX_COLUMNS * MAX_ROWS);
 Console.CursorVisible = false;
-Console.WindowWidth = MAX_WIDTH * 2;
-Console.WindowHeight = MAX_HEIGTH * 2;
+Console.WindowWidth = MAX_COLUMNS * 2;
+Console.WindowHeight = MAX_ROWS * 2;
 Thread.Sleep(1000);
 
 while (!stop)
 {
-    DisplayGrid();
-    Thread.Sleep(1000);
-    grid = NextIteration();
-    generation++;
+	DisplayGrid();
+	Thread.Sleep(1000);
+	int[,] newGrid = NextIteration();
+	grid = new int[MAX_ROWS, MAX_COLUMNS];  
+	Array.Copy(newGrid, grid, MAX_ROWS * MAX_COLUMNS);
+	generation++;
 }
 
 void DisplayGrid()
 {
-    for (int i = 0; i < MAX_HEIGTH; i++)
-    {
-        for (int j = 0; j < MAX_WIDTH; j++)
-        {
-            Console.SetCursorPosition(j, i);
-            Console.Write(grid[i, j] == 1 ? "O" : " ");
-        }
-        Console.WriteLine();
-    }
-    Console.WriteLine($"Generation {generation}");
+	Console.WriteLine($"Generation {generation}");
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int column = 0; column < MAX_COLUMNS; column++)
+		{
+			Console.SetCursorPosition(column, row);
+			Console.Write(grid[row, column] == 1 ? "O" : " ");
+		}
+		Console.WriteLine();
+	}
 }
 
 int[,] NextIteration()
 {
-    int[,] nextGrid = new int[MAX_HEIGTH, MAX_WIDTH];
+	int[,] nextGrid = new int[MAX_ROWS, MAX_COLUMNS];
 
-    for (int y = 0; y < MAX_WIDTH; y++)
-    {
-        for (int x = 0; x < MAX_HEIGTH; x++)
-        {
-            int neighbors = GetNumberOfNeighbors(x, y);
+	for (int row = 0; row < MAX_ROWS; row++)
+	{
+		for (int column = 0; column < MAX_COLUMNS; column++)
+		{
+			int neighbors = GetNumberOfNeighbors(row, column);
 
-            // if current cell is alive
-            if (grid[x, y] == 1)
-            {
-                // Cell is alive
-                nextGrid[x, y] = (neighbors == 2 || neighbors == 3) ? 1 : 0;
-            }
-            else
-            {
-                nextGrid[x, y] = (neighbors == 3) ? 1 : 0;
-            }
-        }
-    }
-    return nextGrid;
+			//Console.WriteLine($"Grid value at ({row}, {column}) before update: {grid[row, column]}");
+			//Console.WriteLine($"Number of neighbors at ({row}, {column}): {neighbors}");
+
+			// if current cell is alive
+			if (grid[row, column] == 1)
+			{
+				// Cell is alive
+				nextGrid[row, column] = (neighbors == 2 || neighbors == 3) ? 1 : 0;
+			}
+			else
+			{
+				nextGrid[row, column] = (neighbors == 3) ? 1 : 0;
+			}
+		}
+	}
+	return nextGrid;
 }
 
-int GetNumberOfNeighbors(int x, int y)
+int GetNumberOfNeighbors(int row, int column)
 {
-    int neighbors = 0;
+	int neighbors = 0;
 
-    // Loop over neighboring cells in a 3x3 grid around the cell at position (x,y)
-    for (int dx = (x > 0 ? -1 : 0); dx <= (x == MAX_HEIGTH ? 0 : 1); dx++)
-    {
-        for (int dy = (y > 0 ? -1 : 0); dy <= (y == MAX_HEIGTH - 1 ? 0 : 1); dy++)
-        {
-            // if center cell
-            if (dx == 0 && dy == 0)
-                continue;
+	// Loop over neighboring cells in a 3x3 grid around the cell at position (x,y)
+	for (int dx = (row > 0 ? -1 : 0); dx <= (row == MAX_ROWS - 1 ? 0 : 1); dx++)
+	{
+		for (int dy = (column > 0 ? -1 : 0); dy <= (column == MAX_COLUMNS - 1 ? 0 : 1); dy++)
+		{
+			// if center cell
+			if (dx == 0 && dy == 0)
+				continue;
 
-            int neighborX = (x + dx + MAX_HEIGTH) % MAX_HEIGTH;
-            int neighborY = (y + dy + MAX_HEIGTH) % MAX_HEIGTH;
+			int neighborRow = row + dx;
+			int neighborColumn = column + dy;
 
-            // if cell not dead
-            if (grid[neighborX, neighborY] == 1)
-                neighbors++;
+			// if cell not dead
+			if (grid[neighborRow, neighborColumn] == 1)
+				neighbors++;
 
-        }
-    }
-    return neighbors;
+		}
+	}
+	return neighbors;
 }
