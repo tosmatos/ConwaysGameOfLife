@@ -14,7 +14,7 @@ Thread.Sleep(1000);
 while (!stop)
 {
 	DisplayGrid();
-	Thread.Sleep(1000);
+	Thread.Sleep(50);
 	int[,] newGrid = NextIteration();
 	grid = new int[MAX_ROWS, MAX_COLUMNS];  
 	Array.Copy(newGrid, grid, MAX_ROWS * MAX_COLUMNS);
@@ -23,16 +23,17 @@ while (!stop)
 
 void DisplayGrid()
 {
-	Console.WriteLine($"Generation {generation}");
 	for (int row = 0; row < MAX_ROWS; row++)
 	{
 		for (int column = 0; column < MAX_COLUMNS; column++)
 		{
-			Console.SetCursorPosition(column, row);
+			Console.SetCursorPosition(column * 2, row);
 			Console.Write(grid[row, column] == 1 ? "O" : " ");
 		}
 		Console.WriteLine();
 	}
+	Console.SetCursorPosition(0, MAX_ROWS + 1);
+	Console.Write($"Generation {generation}");
 }
 
 int[,] NextIteration()
